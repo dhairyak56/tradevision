@@ -15,20 +15,105 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Mock data generators
-def generate_stock_price(symbol: str):
-    base_prices = {"AAPL": 175, "MSFT": 350, "GOOGL": 135, "TSLA": 250}
-    base_price = base_prices.get(symbol, 100)
-    price = base_price + random.uniform(-10, 10)
-    change = random.uniform(-5, 5)
-    return {
-        "symbol": symbol,
-        "price": round(price, 2),
-        "change": round(change, 2),
-        "change_percent": round((change / price) * 100, 2),
-        "volume": random.randint(100000, 10000000),
-        "timestamp": datetime.now().isoformat()
-    }
+import yfinance as yf
+from datetime import datetime, timedelta
+
+def get_real_stock_data(symbol: str):
+    try:
+        # Get real data from Yahoo Finance
+        ticker = yf.Ticker(symbol)
+        
+        # Get current day data with 1-minute intervals
+        hist = ticker.history(period="1d", interval="1m")
+        
+        if hist.empty:
+            # Fallback to daily data if intraday fails
+            hist = ticker.history(period="2d", interval="1d")
+        
+        # Get the latest price
+        current_price = float(hist['Close'].iloc[-1])
+        previous_price = float(hist['Close'].iloc[-2]) if len(hist) > 1 else current_price
+        
+        # Calculate change
+        change = current_price - previous_price
+        change_percent = (change / previous_price) * 100 if previous_price != 0 else 0
+        
+        # Get volume
+        volume = int(hist['Volume'].iloc[-1]) if 'Volume' in hist.columns else 0
+        
+        return {
+            "symbol": symbol,
+            "price": round(current_price, 2),
+            "change": round(change, 2),
+            "change_percent": round(change_percent, 2),
+            "volume": volume,
+            "timestamp": datetime.now().isoformat()
+        }
+    
+    except Exception as e:
+        print(f"Error fetching data for {symbol}: {e}")
+        # Return mock data as fallback
+        return {
+            "symbol": symbol,
+            "price": 100.0 + random.uniform(-10, 10),
+            "change": random.uniform(-5, 5),
+            "change_percent": random.uniform(-5, 5),
+            "volume": random.randint(100000, 10000000),
+            "timestamp": datetime.now().isoformat()
+        }
+
+# Update your stock endpoint
+@app.get("/api/stock/{symbol}")
+async def get_stock(symbol: str):
+    return get_real_stock_data(symbol.upper())
+
+
+# Add this new endpoint for historical chart data
+@app.get("/api/stock/{symbol}/history")
+async def get_stock_history(symbol: str):
+    try:
+        ticker = yf.Ticker(symbol)
+        # Get last 24 hours of data
+        hist = ticker.history(period="1d", interval="5m")
+        
+        # Format for frontend charts
+        chart_data = []
+        for idx, row in hist.iterrows():
+            chart_data.append({
+                "time": idx.strftime("%H:%M"),
+                "price": round(float(row['Close']), 2),
+                "volume": int(row['Volume']),
+                "open": round(float(row['Open']), 2),
+                "high": round(float(row['High']), 2),
+                "low": round(float(row['Low']), 2)
+            })
+        
+        return chart_data[-24:]  # Return last 24 data points
+    
+    except Exception as e:
+        print(f"Error fetching history for {symbol}: {e}")
+        # Return mock historical data as fallback
+        data = []
+        base_price = 150
+        for i in range(24):
+            base_price += random.uniform(-2, 2)
+            data.append({
+                "time": f"{i}:00",
+                "price": round(base_price, 2),
+                "volume": random.randint(100000, 1000000),
+                "open": round(base_price + random.uniform(-1, 1), 2),
+                "high": round(base_price + random.uniform(0, 3), 2),
+                "low": round(base_price - random.uniform(0, 3), 2)
+            })
+        return data
+
+
+# Add crypto endpoint
+@app.get("/api/crypto/{symbol}")
+async def get_crypto(symbol: str):
+    # For crypto, Yahoo Finance uses format like BTC-USD
+    crypto_symbol = f"{symbol.upper()}-USD"
+    return get_real_stock_data(crypto_symbol)
 
 # API Routes
 @app.get("/")
