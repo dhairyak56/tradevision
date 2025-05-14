@@ -71,5 +71,7 @@ async def get_risk_metrics():
 
 if __name__ == "__main__":
     import os
+    # Use Railway's PORT environment variable or default to 8000 for local
     port = int(os.environ.get("PORT", 8000))
+    print(f"Starting server on port {port}")  # Debug log
     uvicorn.run(app, host="0.0.0.0", port=port)
