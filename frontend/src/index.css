@@ -1,0 +1,255 @@
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  background-color: #111827;
+  color: white;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.dashboard {
+  min-height: 100vh;
+  background-color: #111827;
+  color: white;
+  padding: 24px;
+}
+
+.header {
+  margin-bottom: 32px;
+}
+
+.title {
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.subtitle {
+  color: #9ca3af;
+}
+
+.grid {
+  display: grid;
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+.grid-3 {
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+
+.grid-2 {
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+}
+
+.card {
+  background-color: #1f2937;
+  border-radius: 8px;
+  padding: 24px;
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.card-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.price {
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.change {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.change.positive {
+  color: #22c55e;
+}
+
+.change.negative {
+  color: #ef4444;
+}
+
+.select {
+  background-color: #374151;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 12px;
+}
+
+.chart-container {
+  height: 300px;
+}
+
+.metrics {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.metric {
+  display: flex;
+  justify-content: space-between;
+}
+
+.metric-label {
+  color: #9ca3af;
+}
+
+.metric-value {
+  font-weight: 600;
+}
+
+.metric-value.red {
+  color: #ef4444;
+}
+
+.metric-value.green {
+  color: #22c55e;
+}
+
+.news-item {
+  background-color: #374151;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.news-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.news-title {
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.news-source {
+  color: #9ca3af;
+  font-size: 0.875rem;
+}
+
+.news-sentiment {
+  text-align: center;
+}
+
+.sentiment-label {
+  color: #9ca3af;
+  font-size: 0.75rem;
+}
+
+.sentiment-value {
+  font-weight: bold;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th,
+.table td {
+  text-align: left;
+  padding: 12px 8px;
+  border-bottom: 1px solid #374151;
+}
+
+.table th {
+  color: #9ca3af;
+  font-weight: 500;
+}
+
+.recommendations {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 16px;
+}
+
+.recommendation {
+  border-radius: 8px;
+  padding: 16px;
+  border: 1px solid;
+}
+
+.recommendation.buy {
+  background-color: rgba(34, 197, 94, 0.1);
+  border-color: #22c55e;
+}
+
+.recommendation.sell {
+  background-color: rgba(239, 68, 68, 0.1);
+  border-color: #ef4444;
+}
+
+.recommendation.hold {
+  background-color: rgba(245, 158, 11, 0.1);
+  border-color: #f59e0b;
+}
+
+.signal-type {
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.signal-type.buy {
+  color: #22c55e;
+}
+
+.signal-type.sell {
+  color: #ef4444;
+}
+
+.signal-type.hold {
+  color: #f59e0b;
+}
+
+.symbol {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.target {
+  color: #9ca3af;
+  font-size: 0.875rem;
+}
+
+.reason {
+  font-size: 0.875rem;
+  margin-top: 4px;
+}
+
+.reason.buy {
+  color: #86efac;
+}
+
+.reason.sell {
+  color: #fca5a5;
+}
+
+.reason.hold {
+  color: #fbbf24;
+}
+
+.footer {
+  margin-top: 32px;
+  text-align: center;
+  color: #6b7280;
+}
