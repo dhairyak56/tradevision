@@ -12,7 +12,7 @@ const TradeVision = () => {
   const [currentPrice, setCurrentPrice] = useState(0);
   const [priceChange, setPriceChange] = useState(0);
 
-  const API_BASE = 'http://localhost:8000';
+  const API_BASE = 'https://tradevision-production-d0e8.up.railway.app';
 
   useEffect(() => {
     const fetchData = async () => {
