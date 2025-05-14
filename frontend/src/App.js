@@ -1,62 +1,62 @@
-import React, { useState, useEffect } from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
-import { TrendingUp, TrendingDown } from 'lucide-react';
-import axios from 'axios';
+import React, { useState, useEffect } from "react";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+} from "recharts";
+import { TrendingUp, TrendingDown } from "lucide-react";
+import axios from "axios";
 
 const TradeVision = () => {
   const [marketData, setMarketData] = useState([]);
   const [newsData, setNewsData] = useState([]);
   const [optionsFlow, setOptionsFlow] = useState([]);
   const [riskMetrics, setRiskMetrics] = useState({});
-  const [selectedStock, setSelectedStock] = useState('AAPL');
+  const [selectedStock, setSelectedStock] = useState("AAPL");
   const [currentPrice, setCurrentPrice] = useState(0);
   const [priceChange, setPriceChange] = useState(0);
 
-  const API_BASE = 'https://tradevision-production-d0e8.up.railway.app';
+  const API_BASE = "https://tradevision-production-d0e8.up.railway.app";
 
+  // Update the useEffect in your frontend
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Fetch stock data
-        const stockResponse = await axios.get(`${API_BASE}/api/stock/${selectedStock}`);
+        // Fetch current stock data
+        const stockResponse = await axios.get(
+          `${API_BASE}/api/stock/${selectedStock}`
+        );
         setCurrentPrice(stockResponse.data.price);
         setPriceChange(stockResponse.data.change);
 
-        // Fetch news
+        // Fetch historical data for charts
+        const historyResponse = await axios.get(
+          `${API_BASE}/api/stock/${selectedStock}/history`
+        );
+        setMarketData(historyResponse.data);
+
+        // Fetch other data...
         const newsResponse = await axios.get(`${API_BASE}/api/news`);
         setNewsData(newsResponse.data);
 
-        // Fetch options flow
         const optionsResponse = await axios.get(`${API_BASE}/api/options-flow`);
         setOptionsFlow(optionsResponse.data);
 
-        // Fetch risk metrics
         const riskResponse = await axios.get(`${API_BASE}/api/risk-metrics`);
         setRiskMetrics(riskResponse.data);
-
-        // Generate mock market data for charts
-        const generateMarketData = () => {
-          const data = [];
-          let price = stockResponse.data.price;
-          for (let i = 0; i < 24; i++) {
-            price += (Math.random() - 0.5) * 5;
-            data.push({
-              time: `${i}:00`,
-              price: Number(price.toFixed(2)),
-              volume: Math.floor(Math.random() * 1000000),
-            });
-          }
-          return data;
-        };
-        setMarketData(generateMarketData());
-
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error("Error fetching data:", error);
       }
     };
 
     fetchData();
-    const interval = setInterval(fetchData, 10000);
+    const interval = setInterval(fetchData, 30000); // Update every 30 seconds
     return () => clearInterval(interval);
   }, [selectedStock]);
 
@@ -70,26 +70,39 @@ const TradeVision = () => {
 
       {/* Main Dashboard Grid */}
       <div className="grid grid-3">
-        
         {/* Stock Overview Card */}
         <div className="card">
           <div className="card-header">
             <h2 className="card-title">Stock Overview</h2>
-            <select 
-              value={selectedStock} 
+            <select
+              value={selectedStock}
               onChange={(e) => setSelectedStock(e.target.value)}
-              className="select"
+              className="bg-gray-700 rounded px-3 py-1"
             >
-              <option value="AAPL">AAPL</option>
-              <option value="MSFT">MSFT</option>
-              <option value="GOOGL">GOOGL</option>
-              <option value="TSLA">TSLA</option>
+              <option value="AAPL">Apple (AAPL)</option>
+              <option value="MSFT">Microsoft (MSFT)</option>
+              <option value="GOOGL">Google (GOOGL)</option>
+              <option value="TSLA">Tesla (TSLA)</option>
+              <option value="AMZN">Amazon (AMZN)</option>
+              <option value="NVDA">NVIDIA (NVDA)</option>
+              <option value="META">Meta (META)</option>
+              <option value="NFLX">Netflix (NFLX)</option>
             </select>
           </div>
           <div className="price">${currentPrice.toFixed(2)}</div>
-          <div className={`change ${priceChange >= 0 ? 'positive' : 'negative'}`}>
-            {priceChange >= 0 ? <TrendingUp size={20} /> : <TrendingDown size={20} />}
-            <span>{priceChange >= 0 ? '+' : ''}{priceChange.toFixed(2)} ({((priceChange / currentPrice) * 100).toFixed(2)}%)</span>
+          <div
+            className={`change ${priceChange >= 0 ? "positive" : "negative"}`}
+          >
+            {priceChange >= 0 ? (
+              <TrendingUp size={20} />
+            ) : (
+              <TrendingDown size={20} />
+            )}
+            <span>
+              {priceChange >= 0 ? "+" : ""}
+              {priceChange.toFixed(2)} (
+              {((priceChange / currentPrice) * 100).toFixed(2)}%)
+            </span>
           </div>
         </div>
 
@@ -103,7 +116,9 @@ const TradeVision = () => {
             </div>
             <div className="metric">
               <span className="metric-label">Sharpe Ratio</span>
-              <span className="metric-value green">{riskMetrics.sharpe_ratio}</span>
+              <span className="metric-value green">
+                {riskMetrics.sharpe_ratio}
+              </span>
             </div>
             <div className="metric">
               <span className="metric-label">Beta</span>
@@ -111,7 +126,9 @@ const TradeVision = () => {
             </div>
             <div className="metric">
               <span className="metric-label">Max Drawdown</span>
-              <span className="metric-value red">{riskMetrics.max_drawdown}%</span>
+              <span className="metric-value red">
+                {riskMetrics.max_drawdown}%
+              </span>
             </div>
           </div>
         </div>
@@ -119,7 +136,6 @@ const TradeVision = () => {
 
       {/* Charts Section */}
       <div className="grid grid-2">
-        
         {/* Price Chart */}
         <div className="card">
           <h2 className="card-title">
@@ -132,11 +148,21 @@ const TradeVision = () => {
                 <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
                 <XAxis dataKey="time" stroke="#9ca3af" />
                 <YAxis stroke="#9ca3af" />
-                <Tooltip 
-                  contentStyle={{ backgroundColor: '#1f2937', border: 'none', borderRadius: '8px' }}
-                  labelStyle={{ color: '#f3f4f6' }}
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: "#1f2937",
+                    border: "none",
+                    borderRadius: "8px",
+                  }}
+                  labelStyle={{ color: "#f3f4f6" }}
                 />
-                <Line type="monotone" dataKey="price" stroke="#3b82f6" strokeWidth={2} dot={false} />
+                <Line
+                  type="monotone"
+                  dataKey="price"
+                  stroke="#3b82f6"
+                  strokeWidth={2}
+                  dot={false}
+                />
               </LineChart>
             </ResponsiveContainer>
           </div>
@@ -151,9 +177,13 @@ const TradeVision = () => {
                 <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
                 <XAxis dataKey="time" stroke="#9ca3af" />
                 <YAxis stroke="#9ca3af" />
-                <Tooltip 
-                  contentStyle={{ backgroundColor: '#1f2937', border: 'none', borderRadius: '8px' }}
-                  labelStyle={{ color: '#f3f4f6' }}
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: "#1f2937",
+                    border: "none",
+                    borderRadius: "8px",
+                  }}
+                  labelStyle={{ color: "#f3f4f6" }}
                 />
                 <Bar dataKey="volume" fill="#10b981" />
               </BarChart>
@@ -175,7 +205,17 @@ const TradeVision = () => {
                 </div>
                 <div className="news-sentiment">
                   <div className="sentiment-label">Sentiment</div>
-                  <div className="sentiment-value" style={{ color: news.sentiment >= 70 ? '#22c55e' : news.sentiment >= 40 ? '#f59e0b' : '#ef4444' }}>
+                  <div
+                    className="sentiment-value"
+                    style={{
+                      color:
+                        news.sentiment >= 70
+                          ? "#22c55e"
+                          : news.sentiment >= 40
+                          ? "#f59e0b"
+                          : "#ef4444",
+                    }}
+                  >
                     {news.sentiment}%
                   </div>
                 </div>
@@ -201,19 +241,32 @@ const TradeVision = () => {
           <tbody>
             {optionsFlow.map((option, index) => (
               <tr key={index}>
-                <td style={{ fontWeight: 'bold' }}>{option.symbol}</td>
-                <td style={{ color: option.option_type === 'call' ? '#22c55e' : '#ef4444' }}>
+                <td style={{ fontWeight: "bold" }}>{option.symbol}</td>
+                <td
+                  style={{
+                    color:
+                      option.option_type === "call" ? "#22c55e" : "#ef4444",
+                  }}
+                >
                   {option.option_type}
                 </td>
                 <td>{option.volume.toLocaleString()}</td>
                 <td>${option.strike}</td>
                 <td>
                   {option.unusual ? (
-                    <span style={{ backgroundColor: '#92400e', color: '#fbbf24', padding: '4px 8px', borderRadius: '4px', fontSize: '0.75rem' }}>
+                    <span
+                      style={{
+                        backgroundColor: "#92400e",
+                        color: "#fbbf24",
+                        padding: "4px 8px",
+                        borderRadius: "4px",
+                        fontSize: "0.75rem",
+                      }}
+                    >
                       Unusual
                     </span>
                   ) : (
-                    <span style={{ color: '#9ca3af' }}>Normal</span>
+                    <span style={{ color: "#9ca3af" }}>Normal</span>
                   )}
                 </td>
               </tr>
